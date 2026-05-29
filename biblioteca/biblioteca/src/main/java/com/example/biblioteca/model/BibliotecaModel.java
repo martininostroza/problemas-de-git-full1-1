@@ -5,24 +5,23 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// El MODELO representa la estructura de los datos en nuestra aplicación.
-// En este caso, define qué información vamos a guardar de un juego (su ID y su Título) 
-// y le avisa a la base de datos cómo debe crear la tabla.
+// El MODELO representa el juego ya asignado a un usuario específico.
+// No tiene campos de edición porque las compras en la biblioteca son definitivas.
 @Data
 @Entity
-@Table(name = "biblioteca_juegos")
+@Table(name = "biblioteca_juegos_usuarios")
 public class BibliotecaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "El título no puede estar vacío")
-    @Column(nullable = false, length = 100)
-    private String titulo;
+    @NotNull(message = "El id del usuario es obligatorio")
+    private Integer usuarioId;
 
+    @NotNull(message = "El id del juego es obligatorio")
+    private Integer juegoId;
 }

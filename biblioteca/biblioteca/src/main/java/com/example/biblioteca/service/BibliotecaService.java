@@ -6,20 +6,20 @@ import com.example.biblioteca.model.BibliotecaModel;
 import com.example.biblioteca.repository.BibliotecaRepository;
 import java.util.List;
 
-// El SERVICIO es el cerebro del microservicio; aquí va la lógica de negocio.
-// Se encarga de recibir los datos, procesarlos o aplicar reglas si fuera necesario,
-// y llamar al Repositorio para que interactúe con la base de datos.
+// El SERVICIO ejecuta la orden de añadir juegos proveniente del Carrito.
 @Service
 public class BibliotecaService {
 
     @Autowired
     private BibliotecaRepository repository;
 
-    public BibliotecaModel guardarJuego(BibliotecaModel juego) {
-        return repository.save(juego);
+    // Registra el juego en la cuenta del usuario
+    public BibliotecaModel agregarALaBiblioteca(BibliotecaModel registro) {
+        return repository.save(registro);
     }
 
-    public List<BibliotecaModel> obtenerTodos() {
-        return repository.findAll();
+    // Devuelve la colección de un usuario
+    public List<BibliotecaModel> obtenerBibliotecaDelUsuario(Integer usuarioId) {
+        return repository.findByUsuarioId(usuarioId);
     }
 }
