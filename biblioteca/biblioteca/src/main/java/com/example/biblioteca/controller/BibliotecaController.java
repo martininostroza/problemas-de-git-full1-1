@@ -8,8 +8,13 @@ import com.example.biblioteca.model.BibliotecaModel;
 import com.example.biblioteca.service.BibliotecaService;
 import java.util.List;
 
-// El CONTROLADOR expone los endpoints en el puerto 8087.
-// Solo permite registrar (POST) y listar (GET). No permite modificaciones (PUT).
+//http://localhost:8087/biblioteca
+// {
+    //     "usuarioId": 1,
+    //     "titulo": "Minecraft"
+    // }
+
+
 @RestController
 @RequestMapping("/biblioteca")
 public class BibliotecaController {
