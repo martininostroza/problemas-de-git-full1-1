@@ -9,6 +9,17 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+
+
+
+//URL: http://localhost:8081/catalogo/guardar
+
+//{
+      // "titulo": "Elden Ring",
+       //"precio": 59.99,
+     //  "genero": "RPG"
+ //  }
+
 @RestController
 @RequestMapping("/catalogo")
 public class GameController {
