@@ -11,6 +11,13 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+
+//{
+  //     "idUsuario": 1,
+   //    "mensaje": "Tu orden de compra ha sido procesada con éxito. ¡Disfruta tu juego!",
+   //    "tipo": "Correo"
+  // }
+
 @RestController
 @RequestMapping("/notificaciones")
 public class NotificacionController {
