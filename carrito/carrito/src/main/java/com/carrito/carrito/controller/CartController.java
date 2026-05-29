@@ -16,10 +16,13 @@ public class CartController {
     @Autowired
     private CartService service;
     //http://localhost:8086/carrito/agregar
+    //{
+    //   "idUsuario": 1,
+    //   "idJuego": 2,
+    //   "cantidad": 1
+    //}
 
-   // "idUsuario": 1,
-  //"idGame": 2,
-  //"cantidad": 3
+ 
 
     // Retorna la lista completa de artículos en el carrito cruzados con la información de catálogo
     @GetMapping("/{idUsuario}/juegos-carrito")
