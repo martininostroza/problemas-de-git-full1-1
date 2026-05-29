@@ -7,10 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;  
 
-// El MODELO representa el juego ya asignado a un usuario específico.
-// No tiene campos de edición porque las compras en la biblioteca son definitivas.
 @Data
+@AllArgsConstructor 
+@NoArgsConstructor  
 @Entity
 @Table(name = "biblioteca_juegos_usuarios")
 public class BibliotecaModel {
@@ -23,5 +25,5 @@ public class BibliotecaModel {
     private Integer usuarioId;
 
     @NotNull(message = "El id del juego es obligatorio")
-    private Integer juegoId;
+    private String titulo; 
 }
