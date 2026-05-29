@@ -14,13 +14,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
-    private Integer id;
+    @Column(name = "id_game", nullable = false, updatable = false)
+    private Integer idGame;
 
     @NotBlank(message = "El título no puede estar vacío")
     @Column(name = "titulo", nullable = false)

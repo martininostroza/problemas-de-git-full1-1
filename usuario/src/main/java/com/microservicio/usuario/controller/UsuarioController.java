@@ -16,12 +16,13 @@ public class UsuarioController {
     // POSTMAN
     // url: http://localhost:8082/usuarios/agregar
     /*
+    
     body:
     {
-        "nombre": "Lara",
-        "apellido": "Croft",
-        "email": "Lara.Croft@example.com",
-        "password": "tombraider123",
+        "nombre": "Nathan",
+        "apellido": "Drake",
+        "email": "nathan.drake@uncharted.com",
+        "password": "treasure777",
         "rol": {
             "idRol": 2
         }
