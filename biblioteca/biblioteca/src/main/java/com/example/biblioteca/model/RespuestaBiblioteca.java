@@ -1,4 +1,4 @@
-package com.biblioteca.biblioteca.model;
+package com.example.biblioteca.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LibraryResponse {
-    private Integer idLibraryEntry;
+public class RespuestaBiblioteca {
+    private Integer idEntradaBiblioteca;
     private Integer idUsuario;
-    private Integer idGame;
+    private Integer idJuego;
     private String estado;
 }
