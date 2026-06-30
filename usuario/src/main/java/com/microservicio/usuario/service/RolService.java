@@ -4,7 +4,6 @@ import com.microservicio.usuario.model.Rol;
 import com.microservicio.usuario.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -12,37 +11,36 @@ import java.util.Optional;
 public class RolService {
 
     @Autowired
-    private RolRepository rolRepository;
+    private RolRepository repository;
 
     public List<Rol> listarRoles() {
-        return rolRepository.findAll();
+        return repository.findAll();
     }
 
     public Optional<Rol> buscarPorIdRol(Integer idRol) {
-        return rolRepository.findByIdRol(idRol);
+        return repository.findByIdRol(idRol);
     }
 
     public Optional<Rol> buscarPorNombreRol(String nombreRol) {
-        return rolRepository.findByNombreRol(nombreRol);
+        return repository.findByNombreRol(nombreRol);
     }
 
+    
     public Rol agregarRol(Rol rol) {
-        return rolRepository.save(rol);
-    }
-
-    public Optional<Rol> actualizarRol(Integer idRol, Rol rolActualizado) {
-        return rolRepository.findByIdRol(idRol).map(rolExistente -> {
-            rolExistente.setNombreRol(rolActualizado.getNombreRol());
-                return rolRepository.save(rolExistente);
-        });
-    }
-
-    public boolean eliminarRol(Integer idRol) {
-        if(rolRepository.existsById(idRol)) {
-            rolRepository.deleteById(idRol);
-            return true;
+        Optional<Rol> existente = repository.findByNombreRol(rol.getNombreRol());
+        if (existente.isPresent()) {
+            return existente.get(); // Si ya existe el rol ADMIN, te devuelve el que ya está y no rompe nada
         }
-        return false;
+        return repository.save(rol);
     }
 
+    public Rol actualizarRol(Integer idRol, Rol rolActualizado) {
+        Optional<Rol> existe = repository.findByIdRol(idRol);
+        if (existe.isEmpty()) {
+            return null;
+        }
+        Rol rol = existe.get();
+        rol.setNombreRol(rolActualizado.getNombreRol());
+        return repository.save(rol);
+    }
 }

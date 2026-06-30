@@ -1,13 +1,14 @@
 package com.microservicio.usuario.service;
 
+import com.microservicio.usuario.model.Rol;
 import com.microservicio.usuario.model.Usuario;
+import com.microservicio.usuario.repository.RolRepository;
 import com.microservicio.usuario.repository.UsuarioRepository;
+import com.microservicio.usuario.dto.UsuarioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
-import java.util.Optional;
-import com.microservicio.usuario.dto.UsuarioDTO;
 
 @Service
 public class UsuarioService {
@@ -15,72 +16,76 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private final PasswordEncoder passwordEncoder;
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
-        this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private RolRepository rolRepository;
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuario> buscarPorId(Integer idUsuario) {
-        return usuarioRepository.findByIdUsuario(idUsuario);
+    // EXCEPCIÓN DIRECTA: Desempaquetamos el Optional de inmediato
+    public Usuario buscarPorId(Integer idUsuario) {
+        return usuarioRepository.findByIdUsuario(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró ningún usuario con el ID: " + idUsuario));
     }
 
-    public List<Usuario> buscarPorNombre(String nombre) {
-        return usuarioRepository.findByNombre(nombre);
-    }
-
-    public List<Usuario> buscarPorApellido(String apellido) {
-        return usuarioRepository.findByApellido(apellido);
-    }
-
-    public Optional<Usuario> buscarPorEmail(String email) {
-        return usuarioRepository.findByEmailIgnoreCase(email);
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró ningún usuario con el correo electrónico: " + email));
     }
 
     public Usuario agregarUsuario(Usuario usuario) {
-        String passwordEncriptada = passwordEncoder.encode(usuario.getPassword());
-        usuario.setPassword(passwordEncriptada);
+        // Evita que se registren emails duplicados
+        if (usuarioRepository.findByEmailIgnoreCase(usuario.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("El correo electrónico ya se encuentra registrado por otro usuario.");
+        }
+
+        if (usuario.getRol() != null && usuario.getRol().getIdRol() != null) {
+            Rol rol = rolRepository.findByIdRol(usuario.getRol().getIdRol())
+                    .orElseThrow(() -> new IllegalArgumentException("El rol especificado con ID " + usuario.getRol().getIdRol() + " no existe."));
+            usuario.setRol(rol);
+        }
         return usuarioRepository.save(usuario);
     }
 
-    public Optional<Usuario> actualizarUsuario(Integer idUsuario, Usuario usuarioActualizado) {
-    return usuarioRepository.findByIdUsuario(idUsuario).map(usuario -> {
+    // CONTROL TOTAL DESDE SERVICE: Devuelve el objeto modificado o rompe el flujo con excepción
+    public Usuario actualizarUsuario(Integer idUsuario, Usuario usuarioActualizado) {
+        Usuario usuario = usuarioRepository.findByIdUsuario(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("No se puede actualizar: El usuario con ID " + idUsuario + " no existe."));
+
         usuario.setNombre(usuarioActualizado.getNombre());
         usuario.setApellido(usuarioActualizado.getApellido());
         usuario.setEmail(usuarioActualizado.getEmail());
-        usuario.setPassword(usuarioActualizado.getPassword());
         
-        usuario.setRol(usuarioActualizado.getRol());
+        if (usuarioActualizado.getRol() != null && usuarioActualizado.getRol().getIdRol() != null) {
+            Rol rol = rolRepository.findByIdRol(usuarioActualizado.getRol().getIdRol())
+                    .orElseThrow(() -> new IllegalArgumentException("El rol especificado con ID " + usuarioActualizado.getRol().getIdRol() + " no existe."));
+            usuario.setRol(rol);
+        }
+
         return usuarioRepository.save(usuario);
-    });
-}
-
-    public boolean eliminarUsuario(Integer idUsuario) {
-        if(usuarioRepository.existsById(idUsuario)) {
-            usuarioRepository.deleteById(idUsuario);
-            return true;
-        }
-    return false;
     }
 
-    public UsuarioDTO obtenerDetalleSimple(Integer idUsuario){
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByIdUsuario(idUsuario);
-
-        if(usuarioOpt.isEmpty()){
-            return null;
+    // Borrado validando previamente la existencia del registro
+    public void eliminarUsuario(Integer idUsuario) {
+        if (!usuarioRepository.existsById(idUsuario)) {
+            throw new IllegalArgumentException("No se puede eliminar: El usuario con ID " + idUsuario + " no existe.");
         }
-
-        Usuario usuario = usuarioOpt.get();
-        UsuarioDTO usuarioDTO = new UsuarioDTO();
-        usuarioDTO.setIdUsuario(usuario.getIdUsuario());
-        usuarioDTO.setNombre(usuario.getNombre());
-        usuarioDTO.setApellido(usuario.getApellido());
-        usuarioDTO.setNombreRol(usuario.getRol().getNombreRol());
-        return usuarioDTO;
+        usuarioRepository.deleteById(idUsuario);
     }
 
+    public UsuarioDTO obtenerDetalleSimple(Integer idUsuario) {
+        Usuario u = usuarioRepository.findByIdUsuario(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el detalle del usuario con ID: " + idUsuario));
+
+        String nombreRol = (u.getRol() != null) ? u.getRol().getNombreRol() : "SIN_ROL";
+
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setIdUsuario(u.getIdUsuario());
+        dto.setNombre(u.getNombre());
+        dto.setEmail(u.getEmail());
+        dto.setNombreRol(nombreRol);
+        
+        return dto;
+    }
 }
