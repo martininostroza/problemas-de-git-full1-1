@@ -1,31 +1,18 @@
-# ==========================================
-# ETAPA 1: Compilación y empaquetado (Build)
-# ==========================================
-FROM maven:3.9.6-eclipse-temurin-21-jammy AS builder
-
-WORKDIR /build
-
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-COPY src ./src
-
-RUN mvn clean package -DskipTests
-
-# ==========================================
-# ETAPA 2: Entorno de ejecución (Runtime)
-# ==========================================
-FROM eclipse-temurin:21-jre-jammy
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Usamos el puerto 8089 para usuario
-ENV PORT=8089
-ENV SPRING_PROFILES_ACTIVE=prod
+COPY pom.xml ./
+COPY src ./src
 
-# Ajustado especialmente para tu microservicio de Usuario
-COPY --from=builder /build/target/usuario-0.0.1-SNAPSHOT.jar app.jar
+RUN mvn -q clean package -DskipTests
 
-EXPOSE ${PORT}
+FROM eclipse-temurin:21-jre
 
-ENTRYPOINT ["java", "-server", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8084
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

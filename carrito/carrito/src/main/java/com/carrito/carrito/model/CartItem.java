@@ -19,16 +19,18 @@ public class CartItem {
     @Column(name = "id_cart_item", nullable = false, updatable = false)
     private Integer idCartItem;
 
-    @NotNull(message = "El ID del usuario no puede estar vacío")
+    @NotNull(message = "El ID del usuario es obligatorio")
+    @Min(value = 1, message = "El ID del usuario debe ser un número entero positivo válido")
     @Column(name = "id_usuario", nullable = false)
     private Integer idUsuario;
 
-    @NotNull(message = "El ID del juego no puede estar vacío")
+    @NotNull(message = "El ID del juego es obligatorio")
+    @Min(value = 1, message = "El ID del juego debe ser un número entero positivo válido")
     @Column(name = "id_game", nullable = false)
     private Integer idGame;
 
-    @NotNull(message = "La cantidad no puede estar vacía")
-    @Min(value = 1, message = "La cantidad mínima debe ser 1")
+    @NotNull(message = "La cantidad es obligatoria")
+    @Min(value = 1, message = "La cantidad mínima permitida es 1")
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 }

@@ -1,7 +1,10 @@
 package com.example.soporte.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,17 +22,22 @@ public class TicketSoporte {
     private Integer idTicket;
 
     @NotNull(message = "El ID del usuario es obligatorio")
+    @Min(value = 1, message = "El ID del usuario debe ser un número entero positivo válido")
     @Column(name = "id_usuario", nullable = false)
     private Integer idUsuario;
 
-    @NotNull(message = "El asunto no puede estar vacío")
-    @Column(name = "asunto", nullable = false)
+    @NotBlank(message = "El asunto del ticket es obligatorio")
+    @Size(max = 150, message = "El asunto no puede superar los 150 caracteres")
+    @Column(name = "asunto", nullable = false, length = 150)
     private String asunto;
 
-    @NotNull(message = "La descripción del problema es obligatoria")
-    @Column(name = "descripcion", nullable = false)
+    @NotBlank(message = "La descripción del problema es obligatoria")
+    @Size(max = 2000, message = "La descripción no puede superar los 2000 caracteres")
+    @Column(name = "descripcion", nullable = false, length = 2000)
     private String descripcion;
 
-    @Column(name = "estado")
-    private String estado; // Ejemplo: "Abierto", "En Proceso", "Resuelto"
+    @NotBlank(message = "El estado del ticket es obligatorio")
+    @Size(max = 30, message = "El estado no puede superar los 30 caracteres")
+    @Column(name = "estado", nullable = false, length = 30)
+    private String estado;
 }

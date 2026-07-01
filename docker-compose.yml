@@ -1,74 +1,257 @@
-version: '3.8'
-
 services:
-  autenticacion:
-    image: msvc-autenticacion:v1
-    ports:
-      - "8081:8081"
+  # --- BASES DE DATOS INDIVIDUALES ---
+  mysql-usuario:
+    image: mysql:8.4
+    container_name: mysql-usuario
     environment:
-      - PORT=8081
-      - SPRING_PROFILES_ACTIVE=prod
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: db_usuario
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-usuario-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - microservices-net
 
-  biblioteca:
-    image: msvc-biblioteca:v1
+  mysql-carrito:
+    image: mysql:8.4
+    container_name: mysql-carrito
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: db_carrito
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-carrito-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - microservices-net
+
+  mysql-ticket:
+    image: mysql:8.4
+    container_name: mysql-ticket
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: db_soporte
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql-ticket-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - microservices-net
+
+  mysql-resena:
+    image: mysql:8.4
+    container_name: mysql-resena
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: db_resenas
+    ports:
+      - "3314:3306"
+    volumes:
+      - mysql-resena-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - microservices-net
+
+  # --- INFRAESTRUCTURA SPRING ---
+  eureka-server:
+    build:
+      context: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+      SPRING_PROFILES_ACTIVE: docker
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - microservices-net
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8090:8090"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - microservices-net
+
+  # --- MICROSERVICIOS ---
+  usuario:
+    build:
+      context: ./usuario
+    container_name: usuario
     ports:
       - "8082:8082"
+    depends_on:
+      mysql-usuario:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8082
-      - SPRING_PROFILES_ACTIVE=prod
-
-  carrito:
-    image: msvc-carrito:v1
-    ports:
-      - "8083:8083"
-    environment:
-      - PORT=8083
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
 
   catalogo:
-    image: msvc-catalogo:v1
+    build:
+      context: ./catalogo
+    container_name: catalogo
     ports:
-      - "8084:8084"
+      - "8083:8083"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8084
-      - SPRING_PROFILES_ACTIVE=prod
-
-  favoritos:
-    image: msvc-favoritos:v1
-    ports:
-      - "8085:8085"
-    environment:
-      - PORT=8085
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - microservices-net
 
   notificaciones:
-    image: msvc-notificaciones:v1
+    build:
+      context: ./notificaciones
+    container_name: notificaciones
+    ports:
+      - "8084:8084"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - microservices-net
+
+  autenticacion:
+    build:
+      context: ./Autenticacion/Autenticacion/Autenticacion/Autenticacion
+    container_name: autenticacion
+    ports:
+      - "8081:8081"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
+
+  carrito:
+    build:
+      context: ./carrito/carrito
+    container_name: carrito
     ports:
       - "8086:8086"
+    depends_on:
+      mysql-carrito:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8086
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
 
-  resena:
-    image: msvc-resena:v1
+  biblioteca:
+    build:
+      context: ./biblioteca/biblioteca
+    container_name: biblioteca
     ports:
       - "8087:8087"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8087
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
 
-  soporte:
-    image: msvc-soporte:v1
+  resena:
+    build:
+      context: ./resena/resena/resena
+    container_name: resena
     ports:
       - "8088:8088"
+    depends_on:
+      mysql-resena:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8088
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
 
-  usuario:
-    image: msvc-usuario:v1
+  soporte:
+    build:
+      context: ./soporte/soporte
+    container_name: soporte
     ports:
       - "8089:8089"
+    depends_on:
+      mysql-ticket:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
     environment:
-      - PORT=8089
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
+
+  favoritos:
+    build:
+      context: ./favoritos/favoritos
+    container_name: favoritos
+    ports:
+      - "8085:8085"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  mysql-usuario-data:
+  mysql-carrito-data:
+  mysql-ticket-data:
+  mysql-resena-data:

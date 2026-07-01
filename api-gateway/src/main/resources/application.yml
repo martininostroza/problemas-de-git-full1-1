@@ -1,0 +1,77 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # 1. SERVICIO USUARIOS & ROLES
+            - id: ruta-usuario
+              uri: lb://usuario
+              predicates:
+                - Path=/usuarios/**, /roles/**
+
+            # 2. SERVICIO AUTENTICACIÓN (Independiente)
+            - id: ruta-autenticacion
+              uri: lb://autenticacion
+              predicates:
+                - Path=/auntenticacion**
+
+            # 3. SERVICIO CARRITO
+            - id: ruta-carrito
+              uri: lb://carrito
+              predicates:
+                - Path=/carrito/**
+
+            # 4. SERVICIO BIBLIOTECA
+            - id: ruta-biblioteca
+              uri: lb://biblioteca
+              predicates:
+                - Path=/biblioteca/**
+
+            # 5. SERVICIO CATALOGO
+            - id: ruta-catalogo
+              uri: lb://catalogo
+              predicates:
+                - Path=/catalogo/**
+
+            # 6. SERVICIO FAVORITOS
+            - id: ruta-favoritos
+              uri: lb://favoritos
+              predicates:
+                - Path=/favoritos/**
+
+            # 7. SERVICIO NOTIFICACIONES
+            - id: ruta-notificaciones
+              uri: lb://notificaciones
+              predicates:
+                - Path=/notificaciones/**
+
+            # 8. SERVICIO SOPORTE
+            - id: ruta-soporte
+              uri: lb://soporte
+              predicates:
+                - Path=/soporte/**
+
+            # 9. SERVICIO RESEÑAS
+            - id: ruta-resenas
+              uri: lb://resena
+              predicates:
+                - Path=/resenas/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+
+  instance:
+    prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS:false}
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:${spring.application.name}}
+    instance-id: ${EUREKA_INSTANCE_ID:${spring.application.name}:${server.port}}
