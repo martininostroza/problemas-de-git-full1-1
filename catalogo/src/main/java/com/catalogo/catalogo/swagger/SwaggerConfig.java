@@ -13,7 +13,7 @@ public class SwaggerConfig {
     public OpenAPI catalogoOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API de Catálogo")
+                        .title("API evaluacion 3")
                         .description("API REST para la gestión del catálogo de productos y juegos")
                         .version("1.0")
                   
