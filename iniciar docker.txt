@@ -1,1 +1,4 @@
 docker compose up --build
+
+esta es la url de swagger solo habra que cambiarse el puerto dependiendo de cada micro
+http://localhost:8082/swagger-ui/index.html
