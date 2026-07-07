@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema; // <-- Agregamos este import para Swagger
 
 @Entity
 @Table(name = "tickets_soporte")
@@ -19,6 +20,7 @@ public class TicketSoporte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ticket", nullable = false, updatable = false)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY) // <-- Esto saca el idTicket del body de Swagger
     private Integer idTicket;
 
     @NotNull(message = "El ID del usuario es obligatorio")

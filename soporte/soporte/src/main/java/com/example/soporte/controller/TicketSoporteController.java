@@ -1,5 +1,6 @@
 package com.example.soporte.controller;
 
+// Se usa el modelo TicketSoporte directamente en las respuestas
 import com.example.soporte.model.TicketSoporte;
 import com.example.soporte.service.TicketSoporteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +38,10 @@ public class TicketSoporteController {
         return ResponseEntity.status(201).body(guardado);
     }
 
-    // GET: Listar tickets de soporte por usuario
+    // GET: Listar tickets de soporte por usuario (Cambiado para usar TicketResponseDTO)
     @Operation(
         summary = "Listar tickets por ID de usuario",
-        description = "Devuelve el historial completo de tickets de soporte técnico que han sido abiertos por un usuario específico."
+        description = "Devuelve el historial completo de tickets de soporte técnico que han sido abiertos por un usuario específico incluyendo sus datos de cuenta."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de tickets cargada con éxito."),
@@ -49,7 +50,8 @@ public class TicketSoporteController {
     })
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<TicketSoporte>> listarPorUsuario(@PathVariable Integer idUsuario) {
+        // Delegamos al service para que busque los tickets por usuario
         List<TicketSoporte> tickets = service.obtenerTicketsPorUsuario(idUsuario);
-        return ResponseEntity.status(200).body(tickets);
+        return ResponseEntity.ok(tickets);
     }
 }

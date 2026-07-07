@@ -1,12 +1,12 @@
-package com.microservicio.usuario.dto;
+package com.example.soporte.dto; // El paquete de tu proyecto de soporte
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Data 
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioDTO {
     private Integer idUsuario;
     private String nombre;
