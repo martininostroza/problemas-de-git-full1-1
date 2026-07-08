@@ -17,30 +17,30 @@ public class NotificacionService {
         return repository.findAll();
     }
 
-    //  Evita exponer el Optional al controlador
     public Notificacion findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró ninguna notificación con el ID: " + id));
     }
 
     public Notificacion save(Notificacion notificacion) {
-        // la regla de negocio es Asegurar que una notificación nueva inicie como no leída
+        // Asegurar que una notificación nueva inicie como no leída
         notificacion.setLeido(false);
         return repository.save(notificacion);
     }
 
-    // Lanza excepción si el ID no existe
     public Notificacion update(Integer id, Notificacion notificacionActualizada) {
         Notificacion notificacionExistente = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se puede actualizar: La notificación con ID " + id + " no existe."));
 
         notificacionExistente.setUsuarioId(notificacionActualizada.getUsuarioId());
         notificacionExistente.setMensaje(notificacionActualizada.getMensaje());
-        notificacionExistente.setLeido(notificacionActualizada.isLeido());
+        
+        // CAMBIO AQUÍ: .getLeido() en lugar de .isLeido() por el cambio a Boolean objeto
+        notificacionExistente.setLeido(notificacionActualizada.getLeido());
+        
         return repository.save(notificacionExistente);
     }
 
-    // ELIMINACIÓN LIMPIA: Sin retornar booleanos manuales
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("No se puede eliminar: La notificación con ID " + id + " no existe.");
@@ -52,7 +52,6 @@ public class NotificacionService {
         return repository.findByUsuarioIdAndLeidoFalseOrderByIdNotificacionDesc(usuarioId);
     }
 
-    // la regla de negocio la Acción de marcar como leída sin usar booleanos de respuesta
     public void marcarComoLeida(Integer id) {
         Notificacion notificacion = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se puede modificar: La notificación con ID " + id + " no existe."));

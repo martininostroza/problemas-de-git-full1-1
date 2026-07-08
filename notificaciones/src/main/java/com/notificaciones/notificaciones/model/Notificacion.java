@@ -1,5 +1,6 @@
 package com.notificaciones.notificaciones.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notificaciones")
@@ -20,8 +20,10 @@ public class Notificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) 
     private Integer idNotificacion;
 
+    @JsonProperty("usuarioId") 
     @NotNull(message = "El ID del usuario es obligatorio")
     @Min(value = 1, message = "El ID del usuario debe ser un número entero positivo válido")
     @Column(name = "usuario_id", nullable = false)
@@ -33,15 +35,6 @@ public class Notificacion {
     private String mensaje;
 
     @Column(nullable = false)
-    private boolean leido = false; // Al ser primitivo, no requiere @NotNull ya que su valor por defecto es false
-
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion = LocalDateTime.now(); 
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.fechaCreacion == null) {
-            this.fechaCreacion = LocalDateTime.now();
-        }
-    }
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) 
+    private Boolean leido = false; 
 }

@@ -6,8 +6,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
-
 @Configuration
 public class DataLoader {
 
@@ -16,7 +14,8 @@ public class DataLoader {
         return args -> {
             if (service.count() == 0) {
 
-                service.save(new Notificacion(null, 1, "Se han agregado 3 videojuegos nuevos", false, LocalDateTime.now()));
+                // Se eliminó LocalDateTime.now() del constructor
+                service.save(new Notificacion(null, 1, "Se han agregado 3 videojuegos nuevos", false));
 
                 crearNotificacionSimple(service, 1, "Tu pedido #98765 acaba de ser confirmado.");
                 
@@ -27,10 +26,10 @@ public class DataLoader {
 
     private void crearNotificacionSimple(NotificacionService service, Integer usuarioId, String mensaje) {
         Notificacion notificacion = new Notificacion();
-        notificacion.setUsuarioId(usuarioId); // Ahora recibe Integer
+        notificacion.setUsuarioId(usuarioId);
         notificacion.setMensaje(mensaje);
         notificacion.setLeido(false);
-        notificacion.setFechaCreacion(LocalDateTime.now());
+        // Se eliminó la línea de setFechaCreacion
         service.save(notificacion);
     }
 }

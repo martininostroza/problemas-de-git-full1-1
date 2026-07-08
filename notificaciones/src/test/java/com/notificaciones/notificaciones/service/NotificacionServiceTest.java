@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,7 +33,6 @@ class NotificacionServiceTest {
         baseNotificacion.setUsuarioId(5);
         baseNotificacion.setMensaje("Hola");
         baseNotificacion.setLeido(false);
-        baseNotificacion.setFechaCreacion(LocalDateTime.now());
     }
 
     @Test
@@ -44,8 +42,11 @@ class NotificacionServiceTest {
         Notificacion result = service.findById(10);
 
         assertNotNull(result);
-        assertEquals(10, result.getIdNotificacion());
-        assertFalse(result.isLeido());
+        assertEquals(Integer.valueOf(10), result.getIdNotificacion());
+        
+        // CORREGIDO: Cambiado de isLeido() a getLeido()
+        assertFalse(result.getLeido()); 
+        
         verify(repository, times(1)).findById(10);
     }
 
@@ -66,14 +67,16 @@ class NotificacionServiceTest {
         input.setUsuarioId(1);
         input.setMensaje("Mensaje");
         input.setLeido(true);
-        input.setFechaCreacion(LocalDateTime.now());
 
         when(repository.save(any(Notificacion.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Notificacion result = service.save(input);
 
         assertNotNull(result);
-        assertFalse(result.isLeido(), "Se esperaba que save forzara leido=false");
+        
+        // CORREGIDO: Cambiado de isLeido() a getLeido()
+        assertFalse(result.getLeido(), "Se esperaba que save forzara leido=false");
+        
         verify(repository, times(1)).save(input);
     }
 
@@ -87,4 +90,3 @@ class NotificacionServiceTest {
         verify(repository, times(1)).deleteById(10);
     }
 }
-
