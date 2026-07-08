@@ -20,7 +20,7 @@ public class FavoritosService {
 
     // Consulta por HTTP al catálogo para verificar la existencia del juego y evita duplicados antes de guardar
     public JuegoFavorito agregarAFavoritos(JuegoFavorito favorito) {
-        String url = "http://localhost:8081/catalogo/buscar-id/" + favorito.getIdJuego();
+        String url = "http://localhost:8090/catalogo/buscar-id/" + favorito.getIdJuego();
         
         // COMUNICACIÓN / EXCEPCIÓN: Si el juego no existe en el catálogo, saltará una excepción atrapada por el Global Handler
         try {
