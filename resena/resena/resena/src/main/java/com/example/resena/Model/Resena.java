@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty; 
 
 @Entity
 @Table(name = "resenas")
@@ -25,11 +26,13 @@ public class Resena {
     @NotNull(message = "El ID del usuario es obligatorio")
     @Min(value = 1, message = "El ID del usuario debe ser un número entero positivo válido")
     @Column(name = "id_usuario", nullable = false)
+    @JsonProperty("idUsuario") 
     private Integer idUsuario;
 
     @NotNull(message = "El ID del juego es obligatorio")
     @Min(value = 1, message = "El ID del juego debe ser un número entero positivo válido")
     @Column(name = "id_juego", nullable = false)
+    @JsonProperty("idJuego") 
     private Integer idJuego;
 
     @NotBlank(message = "El comentario de la reseña es obligatorio")
